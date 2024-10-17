@@ -4,25 +4,42 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import jakarta.servlet.http.HttpServletRequest
 import org.gdgzg.design.config.property.TokenProperty
+import org.gdgzg.design.system.security.model.LoginUser
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 
-private const val LOGIN_USER_KEY = "login_user_key"
+/**
+ * 用户token缓存的前缀
+ */
+private const val USER_TOKEN_KEY_PREFIX = "user_token:"
 
 @Component
 class TokenService {
     @Autowired
     lateinit var tokenProperty: TokenProperty
 
-    fun getLoginUser(request: HttpServletRequest) {
-        request.getToken()?.let {
+    @Autowired
+    lateinit var redisTemplate: RedisTemplate<String, LoginUser>
+
+    fun getLoginUser(request: HttpServletRequest): LoginUser? {
+        return request.getToken()?.let {
             val tokenClaims = parseToken(it)
-            val uuid = tokenClaims[LOGIN_USER_KEY] as String
-            uuid
+            val tokenCacheKey = tokenClaims[USER_TOKEN_KEY_PREFIX] as String
+            redisTemplate.opsForValue().get(tokenCacheKey)
         }
     }
 
     fun HttpServletRequest.getToken(): String? = getHeader(tokenProperty.header)?.removePrefix("Bearer ")
+
+    fun cacheLoginUser(loginUser: LoginUser){
+        redisTemplate.opsForValue().set(
+            USER_TOKEN_KEY_PREFIX + loginUser.token,
+            loginUser,
+            tokenProperty.expireTime.toLong(),
+            java.util.concurrent.TimeUnit.MINUTES
+        )
+    }
 
     private fun parseToken(token: String): Claims {
         return Jwts.parser()

@@ -1,9 +1,8 @@
 package org.gdgzg.design.system.security
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.gdgzg.design.common.component.toJson
 import org.gdgzg.design.common.model.RespWrapper
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
@@ -14,10 +13,7 @@ import org.springframework.stereotype.Component
  * 登录失败处理端点
  */
 @Component
-class AuthenticationEntryPointImpl(val objectMapper: ObjectMapper) : AuthenticationEntryPoint {
-    init {
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    }
+class AuthFailEntryPoint : AuthenticationEntryPoint {
 
     override fun commence(
         request: HttpServletRequest,
@@ -28,12 +24,10 @@ class AuthenticationEntryPointImpl(val objectMapper: ObjectMapper) : Authenticat
         response.contentType = "application/json"
         response.characterEncoding = "utf-8"
         response.writer.print(
-            objectMapper.writeValueAsString(
-                RespWrapper(
-                    code = HttpStatus.UNAUTHORIZED.value(),
-                    msg = "请求地址：${request.requestURI}，认证失败"
-                )
-            )
+            RespWrapper(
+                code = HttpStatus.UNAUTHORIZED.value(),
+                msg = "请求地址：${request.requestURI}，认证失败"
+            ).toJson()
         )
     }
 }

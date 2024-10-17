@@ -1,18 +1,29 @@
 package org.gdgzg.design.system.security.model
 
 import org.gdgzg.design.module.entity.UserEntity
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
 
-class LoginUser {
+data class LoginUser(
+
     // 用户信息
-    lateinit var userEntity: UserEntity
+    var userEntity: UserEntity,
 
     // 登录信息
-    lateinit var token: String
-    lateinit var loginTime: LocalDateTime
-    lateinit var expireTime: LocalDateTime
-    lateinit var ip: String  // 登录ip
-    lateinit var location: String    // 登录地点
-    lateinit var browser: String // 浏览器类型
-    lateinit var os: String  // 操作系统
+    var token: String,
+    var loginTime: LocalDateTime,
+    var expireTime: LocalDateTime,
+    var ip: String,  // 登录ip
+    var location: String,    // 登录地点
+    var browser: String, // 浏览器类型
+    var os: String  // 操作系统
+) : UserDetails {
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUsername(): String = userEntity.username
+
+    override fun getPassword(): String = userEntity.password
 }

@@ -12,7 +12,7 @@ class TokenProperty {
     // 令牌秘钥
     var secret: String? = null
 
-    // 令牌有效期（默认30分钟）
+    // 令牌有效期，单位分钟（默认30分钟）
     var expireTime = 0
     var priKey: String? = null
     var pubKey: String? = null

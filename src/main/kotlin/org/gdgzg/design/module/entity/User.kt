@@ -14,9 +14,18 @@ interface UserEntity : Entity<UserEntity>, BaseEntity {
     var mobile: Long // 手机号
     var password: String // 密码
     var avatarUrl: String // 头像图片地址
-    var delFlag: Boolean // 是否删除
+
+    var deleted: Boolean // 是否删除
 }
 
-object UserTable: BaseTable<UserEntity>("user"){
+object UserTable : BaseTable<UserEntity>("user") {
 
+    val username = varchar("username", 32)
+    val nickname = varchar("nickname", 32)
+    val email = varchar("email", 64)
+    val mobile = long("mobile")
+    val password = varchar("password", 64)
+    val avatarUrl = varchar("avatar_url", 128)
+
+    val deleted = bool("deleted").logicDelete()
 }
