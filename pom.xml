@@ -31,6 +31,7 @@
         <kotlin.version>1.9.25</kotlin.version>
         <jwt.version>0.9.1</jwt.version>
         <kaptcha.version>2.3.2</kaptcha.version>
+        <swagger.version>3.0.0</swagger.version>
     </properties>
 
     <dependencies>
@@ -86,6 +87,26 @@
             <artifactId>exposed-java-time</artifactId>
             <version>0.47.0</version>
         </dependency>
+
+        <!-- Springdoc OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.6.9</version>
+        </dependency>
+
+<!--        日志框架-->
+        <dependency>
+            <groupId>io.github.microutils</groupId>
+            <artifactId>kotlin-logging-jvm</artifactId>
+            <version>2.1.21</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.11</version>
+        </dependency>
+
 
         <!-- 自定义验证注解 -->
         <dependency>
