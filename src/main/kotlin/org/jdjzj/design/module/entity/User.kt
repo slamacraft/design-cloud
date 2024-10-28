@@ -1,8 +1,8 @@
 package org.jdjzj.design.module.entity
 
-import org.gdgzg.design.module.base.BaseEntity
-import org.gdgzg.design.module.base.BaseTable
-import org.gdgzg.design.module.base.Entity
+import org.jdjzj.design.module.base.BaseEntity
+import org.jdjzj.design.module.base.BaseTable
+import org.jdjzj.design.module.base.Entity
 
 
 interface UserEntity : Entity<UserEntity>, BaseEntity {

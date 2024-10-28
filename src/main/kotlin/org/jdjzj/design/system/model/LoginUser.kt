@@ -1,6 +1,6 @@
 package org.jdjzj.design.system.model
 
-import org.gdgzg.design.module.entity.UserEntity
+import org.jdjzj.design.module.entity.UserEntity
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime

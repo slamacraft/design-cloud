@@ -1,10 +1,9 @@
 package org.jdjzj.design.system
 
 import cn.hutool.core.util.IdUtil
-import cn.hutool.log.LogFactory
 import com.google.code.kaptcha.Producer
-import jakarta.annotation.Resource
-import mu.KotlinLogging
+import com.google.code.kaptcha.impl.DefaultKaptcha
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
@@ -16,7 +15,7 @@ import java.util.concurrent.TimeUnit
 // 验证码的redis缓存前缀
 private const val CAPTCHA_KEY_PREFIX = "captcha:"
 
-val log = KotlinLogging.logger {}
+private val log = KotlinLogging.logger {}
 
 @Component
 class CaptchaService {

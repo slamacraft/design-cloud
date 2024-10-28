@@ -3,21 +3,25 @@ package org.jdjzj.design.config
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.jdjzj.design.common.annotation.Anonymous
-import org.jdjzj.design.common.annotation.AnonymousType
-import org.gdgzg.design.common.component.toJson
-import org.gdgzg.design.common.model.RespWrapper
+import org.jdjzj.design.common.component.toJson
+import org.jdjzj.design.common.model.RespWrapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.stereotype.Component
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
@@ -33,18 +37,26 @@ import java.util.regex.Pattern
 private val PATTERN: Pattern = Pattern.compile("\\{(.*?)\\}")
 
 @Component
+@EnableWebSecurity
 class SecurityConfig {
     @Autowired
-    lateinit var authenticationEntryPoint: org.jdjzj.design.config.AuthFailEntryPoint
+    lateinit var authenticationEntryPoint: AuthFailEntryPoint
+    @Autowired
+    lateinit var authenticationConfiguration: AuthenticationConfiguration
 
     @Autowired
     lateinit var requestMappingHandlerMapping: RequestMappingHandlerMapping
 
     /**
-     * 跨域过滤器
+     * 解决 无法直接注入 AuthenticationManager
+     *
+     * @return
+     * @throws Exception
      */
-    @Autowired
-    lateinit var corsFilter: CorsFilter
+    @Bean
+    fun authenticationManagerBean(): AuthenticationManager {
+        return authenticationConfiguration.authenticationManager
+    }
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -85,14 +97,37 @@ class SecurityConfig {
             val paths = info.listPath()
 
             // 方法上的匿名注解
-            AnnotationUtils.findAnnotation(handlerMethod.method, org.jdjzj.design.common.annotation.Anonymous::class.java)?.let { annotation ->
+            AnnotationUtils.findAnnotation(handlerMethod.method, Anonymous::class.java)?.let { annotation ->
                 it.permitPath(paths, annotation)
             }
             // 类上的注解
-            AnnotationUtils.findAnnotation(handlerMethod.beanType, org.jdjzj.design.common.annotation.Anonymous::class.java)?.let { annotation ->
+            AnnotationUtils.findAnnotation(handlerMethod.beanType, Anonymous::class.java)?.let { annotation ->
                 it.permitPath(paths, annotation)
             }
         }
+    }
+
+    /**
+     * 跨域配置
+     */
+    @Bean
+    fun corsFilter(): CorsFilter {
+        val config = CorsConfiguration()
+        // 允许跨域
+        config.allowCredentials = true
+        // 设置访问源地址
+        config.addAllowedOriginPattern("*")
+        // 设置访问源请求头
+        config.addAllowedHeader("*")
+        // 设置访问源请求方法
+        config.addAllowedMethod("*")
+        // 有效期 1800秒
+        config.maxAge = 1800L
+        // 添加映射路径，对所有路径生效
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", config)
+        // 返回新的CorsFilter
+        return CorsFilter(source)
     }
 }
 
@@ -121,7 +156,7 @@ class AuthFailEntryPoint : AuthenticationEntryPoint {
 
 private fun AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry.permitPath(
     paths: List<String>,
-    annotation: org.jdjzj.design.common.annotation.Anonymous
+    annotation: Anonymous
 ) {
     paths.forEach { path ->
         when (annotation.type) {
@@ -132,6 +167,6 @@ private fun AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRe
 }
 
 private fun RequestMappingInfo.listPath(): List<String> = patternsCondition?.patterns?.map {
-    org.jdjzj.design.config.PATTERN.matcher(it).replaceAll("*")
+    PATTERN.matcher(it).replaceAll("*")
 } ?: listOf()
 

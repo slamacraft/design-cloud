@@ -1,10 +1,10 @@
 package org.jdjzj.design.system
 
-import org.gdgzg.design.common.exception.ServiceException
-import org.gdgzg.design.module.entity.UserTable
-import org.gdgzg.design.module.entity.UserTable.notLogicDelete
+import org.jdjzj.design.common.exception.ServiceException
+import org.jdjzj.design.module.entity.UserTable
+import org.jdjzj.design.module.entity.UserTable.notLogicDelete
 import org.jdjzj.design.system.model.LoginReq
-import org.gdgzg.design.system.model.LoginUser
+import org.jdjzj.design.system.model.LoginUser
 import org.jetbrains.exposed.sql.selectAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AuthenticationManager
